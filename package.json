@@ -1,0 +1,42 @@
+{
+  "name": "sql-oj",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:portable": "tauri build --no-bundle && powershell -ExecutionPolicy Bypass -File scripts/package-portable.ps1",
+    "verify:bank": "python scripts/verify_bank.py --write-back",
+    "verify:bank:fix": "python scripts/verify_bank.py --write-back --fix-expected",
+    "generate:solutions": "python scripts/generate_solution_sql.py --bank banks/pta-150 --write",
+    "generate:solutions:dry": "python scripts/generate_solution_sql.py --bank banks/pta-150",
+    "check:alignment": "python scripts/check_alignment.py --bank banks/pta-150",
+    "check:alignment:fix": "python scripts/check_alignment.py --bank banks/pta-150 --fix",
+    "check:consistency": "python scripts/check_consistency.py",
+    "import:external": "python scripts/import_external_problems.py --bank banks/pta-150",
+    "import:external:dry": "python scripts/import_external_problems.py --bank banks/pta-150 --dry-run"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@tauri-apps/api": "^2.5.0",
+    "@tauri-apps/plugin-dialog": "^2.2.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^6.30.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.5.0",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
+    "@vitejs/plugin-react": "^4.4.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://schema.tauri.app/schema/2/capability.json",
+  "identifier": "default",
+  "description": "Default capability for SQL OJ",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "dialog:default"
+  ]
+}

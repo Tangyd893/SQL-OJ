@@ -1,0 +1,6 @@
+{
+  "id": "p002",
+  "title": "统计每门课选课人数",
+  "difficulty": "medium",
+  "tags": ["GROUP BY", "JOIN"]
+}

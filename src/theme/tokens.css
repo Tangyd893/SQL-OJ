@@ -1,0 +1,210 @@
+/**
+ * Fieldguide Semantic CSS Tokens (from Fieldguide/src/renderer/theme/tokens.css)
+ * Components reference --fg-* tokens only.
+ */
+
+:root {
+  --fg-bg: #fafafa;
+  --fg-card: #ffffff;
+  --fg-border: #e5e7eb;
+  --fg-chrome-bg: #eef0f4;
+  --fg-chrome-border: #d5d9e0;
+  --fg-panel-chrome: #f3f4f6;
+  --fg-sidebar-bg: #eef0f4;
+  --fg-text-primary: #111827;
+  --fg-text-secondary: #6b7280;
+  --fg-text-tertiary: #9ca3af;
+  --fg-accent: #2563eb;
+  --fg-accent-muted: #dbeafe;
+  --fg-accent-text: #1d4ed8;
+  --fg-tree-selected: #e4e6f1;
+  --fg-tree-hover: #f3f4f6;
+  --fg-tab-active: #2563eb;
+  --fg-tab-hover: #6b7280;
+  --fg-scrollbar-thumb: #d1d5db;
+  --fg-scrollbar-track: transparent;
+  --fg-input-bg: #ffffff;
+  --fg-input-border: #d1d5db;
+  --fg-input-text: #111827;
+  --fg-input-placeholder: #9ca3af;
+  --fg-input-disabled-bg: #f3f4f6;
+  --fg-input-disabled-text: #6b7280;
+  --fg-surface-raised: #f3f4f6;
+  --fg-overlay: rgba(0, 0, 0, 0.3);
+  --fg-modal-scrim: rgba(0, 0, 0, 0.55);
+  --fg-dialog-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  --fg-status-success: #16a34a;
+  --fg-status-success-bg: #dcfce7;
+  --fg-status-warning: #d97706;
+  --fg-status-warning-bg: #fef3c7;
+  --fg-status-error: #dc2626;
+  --fg-status-error-bg: #fee2e2;
+  --fg-status-info: #2563eb;
+  --fg-status-info-bg: #dbeafe;
+  --fg-syntax-string: #16a34a;
+  --fg-syntax-comment: #9ca3af;
+  --fg-syntax-number: #f97316;
+  --fg-syntax-keyword: #9333ea;
+}
+
+:root[data-theme='dark'] {
+  --fg-bg: #0f172a;
+  --fg-card: #1e293b;
+  --fg-border: #334155;
+  --fg-chrome-bg: #0b1220;
+  --fg-chrome-border: #1e293b;
+  --fg-panel-chrome: #152033;
+  --fg-sidebar-bg: #0b1220;
+  --fg-text-primary: #f8fafc;
+  --fg-text-secondary: #94a3b8;
+  --fg-text-tertiary: #64748b;
+  --fg-accent: #60a5fa;
+  --fg-accent-muted: #1e3a5f;
+  --fg-accent-text: #93bbfd;
+  --fg-tree-selected: #1e3a5f;
+  --fg-tree-hover: #1e293b;
+  --fg-tab-active: #60a5fa;
+  --fg-tab-hover: #94a3b8;
+  --fg-scrollbar-thumb: #475569;
+  --fg-input-bg: #1e293b;
+  --fg-input-border: #475569;
+  --fg-input-text: #f8fafc;
+  --fg-input-placeholder: #64748b;
+  --fg-input-disabled-bg: #0f172a;
+  --fg-input-disabled-text: #64748b;
+  --fg-surface-raised: #152033;
+  --fg-overlay: rgba(0, 0, 0, 0.5);
+  --fg-modal-scrim: rgba(0, 0, 0, 0.6);
+  --fg-dialog-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --fg-syntax-string: #4ade80;
+  --fg-syntax-comment: #6b7280;
+  --fg-syntax-number: #fb923c;
+  --fg-syntax-keyword: #c084fc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --fg-bg: #0f172a;
+    --fg-card: #1e293b;
+    --fg-border: #334155;
+    --fg-chrome-bg: #0b1220;
+    --fg-chrome-border: #1e293b;
+    --fg-panel-chrome: #152033;
+    --fg-sidebar-bg: #0b1220;
+    --fg-text-primary: #f8fafc;
+    --fg-text-secondary: #94a3b8;
+    --fg-text-tertiary: #64748b;
+    --fg-accent: #60a5fa;
+    --fg-accent-muted: #1e3a5f;
+    --fg-accent-text: #93bbfd;
+    --fg-tree-selected: #1e3a5f;
+    --fg-tree-hover: #1e293b;
+    --fg-tab-active: #60a5fa;
+    --fg-tab-hover: #94a3b8;
+    --fg-scrollbar-thumb: #475569;
+    --fg-input-bg: #1e293b;
+    --fg-input-border: #475569;
+    --fg-input-text: #f8fafc;
+    --fg-input-placeholder: #64748b;
+    --fg-input-disabled-bg: #0f172a;
+    --fg-input-disabled-text: #64748b;
+    --fg-surface-raised: #152033;
+    --fg-overlay: rgba(0, 0, 0, 0.5);
+    --fg-modal-scrim: rgba(0, 0, 0, 0.6);
+    --fg-dialog-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    --fg-syntax-string: #4ade80;
+    --fg-syntax-comment: #6b7280;
+    --fg-syntax-number: #fb923c;
+    --fg-syntax-keyword: #c084fc;
+  }
+}
+
+:root[data-theme-preset='parchment'] {
+  --fg-bg: #fdfcf8;
+  --fg-card: #ffffff;
+  --fg-border: #e5e5e5;
+  --fg-chrome-bg: #ede9e0;
+  --fg-chrome-border: #d9d3c7;
+  --fg-panel-chrome: #f5f2eb;
+  --fg-sidebar-bg: #ede9e0;
+  --fg-text-primary: #222222;
+  --fg-text-secondary: #757575;
+  --fg-text-tertiary: #9e9e9e;
+  --fg-accent: #4a8b71;
+  --fg-accent-muted: #ebf4f0;
+  --fg-accent-text: #2d7d74;
+  --fg-tree-selected: #e8f0ec;
+  --fg-tree-hover: #f5f5f0;
+  --fg-tab-active: #4a8b71;
+  --fg-input-bg: #ffffff;
+  --fg-input-border: #e0e0e0;
+  --fg-input-text: #222222;
+  --fg-input-placeholder: #9e9e9e;
+  --fg-input-disabled-bg: #f5f5f0;
+  --fg-input-disabled-text: #9e9e9e;
+  --fg-surface-raised: #f5f2eb;
+  --fg-status-info: #4a90e2;
+  --fg-status-info-bg: #ebf3fc;
+}
+
+:root[data-theme-preset='slate'] {
+  --fg-bg: #f0f2f5;
+  --fg-card: #ffffff;
+  --fg-border: #d1d5db;
+  --fg-chrome-bg: #e2e6ec;
+  --fg-chrome-border: #c5cbd4;
+  --fg-panel-chrome: #e8ecf1;
+  --fg-sidebar-bg: #e2e6ec;
+  --fg-accent: #6366f1;
+  --fg-accent-muted: #eef2ff;
+  --fg-accent-text: #4338ca;
+  --fg-tab-active: #6366f1;
+  --fg-input-bg: #ffffff;
+  --fg-input-border: #d1d5db;
+  --fg-input-text: #111827;
+  --fg-input-placeholder: #9ca3af;
+  --fg-input-disabled-bg: #f3f4f6;
+  --fg-input-disabled-text: #6b7280;
+  --fg-surface-raised: #e8ecf1;
+}
+
+:root[data-theme-preset='midnight'] {
+  --fg-bg: #0d1117;
+  --fg-card: #161b22;
+  --fg-border: #30363d;
+  --fg-chrome-bg: #010409;
+  --fg-chrome-border: #21262d;
+  --fg-panel-chrome: #12171e;
+  --fg-sidebar-bg: #010409;
+  --fg-text-primary: #e6edf3;
+  --fg-text-secondary: #8b949e;
+  --fg-accent: #79c0ff;
+  --fg-accent-muted: #1a2a42;
+  --fg-accent-text: #a5d6ff;
+  --fg-tab-active: #79c0ff;
+  --fg-input-bg: #161b22;
+  --fg-input-border: #30363d;
+  --fg-input-text: #e6edf3;
+  --fg-input-placeholder: #8b949e;
+  --fg-input-disabled-bg: #0d1117;
+  --fg-input-disabled-text: #8b949e;
+  --fg-surface-raised: #21262d;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--fg-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--fg-scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fg-text-tertiary);
+}

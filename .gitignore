@@ -1,0 +1,17 @@
+node_modules/
+dist/
+src-tauri/target/
+banks/
+scripts/_transcript_extract/
+scripts/_*.py
+scripts/_*.txt
+scripts/data/*-report.json
+*.log
+.DS_Store
+Thumbs.db
+desktop/
+dist-installer/
+dist-portable/
+_fetch_all.json
+_sqlite_solutions.json
+app-icon.png

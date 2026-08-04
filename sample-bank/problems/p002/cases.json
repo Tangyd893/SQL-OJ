@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {
+      "id": "1",
+      "seed": "",
+      "expected_columns": ["course_id", "title", "cnt"],
+      "expected_rows": [
+        [101, "Database", 3],
+        [102, "Algorithms", 2],
+        [103, "Networks", 1]
+      ]
+    }
+  ]
+}

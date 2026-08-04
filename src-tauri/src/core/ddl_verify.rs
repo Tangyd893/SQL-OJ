@@ -1,0 +1,196 @@
+//! DDL / DML 题：在用户 SQL 后追加验证 SELECT（与 scripts/ddl_verify.py 对齐）。
+use super::problem::TestCase;
+
+const INDEX_LIST_SQL: &str = r"
+SELECT GROUP_CONCAT(ii.name, ',') AS columns, il.name AS index_name
+FROM pragma_index_list('orders') AS il
+JOIN pragma_index_info(il.name) AS ii
+WHERE il.name LIKE 'idx_%'
+GROUP BY il.name
+ORDER BY il.name
+";
+
+fn has_select(sql: &str) -> bool {
+    let upper = sql.to_ascii_uppercase();
+    upper.contains("SELECT") || upper.contains("WITH")
+}
+
+fn has_dml(sql: &str) -> bool {
+    let upper = sql.to_ascii_uppercase();
+    upper.contains("UPDATE") || upper.contains("INSERT") || upper.contains("DELETE")
+}
+
+fn has_create(sql: &str) -> bool {
+    sql.to_ascii_uppercase().contains("CREATE")
+}
+
+fn table_from_schema(schema: &str) -> Option<String> {
+    let re = regex::Regex::new(r"(?i)CREATE\s+TABLE\s+(\w+)").ok()?;
+    re.captures(schema)?.get(1).map(|m| m.as_str().to_string())
+}
+
+pub fn build_verify_sql(problem_id: &str, case: &TestCase, schema_hint: &str, sql: &str) -> Option<String> {
+    if has_select(sql) {
+        return None;
+    }
+
+    let cols = &case.expected_columns;
+    let case_id = case.id.as_str();
+
+    if !cols.is_empty() && has_dml(sql) && !has_create(sql) {
+        let schema = case.schema.as_deref().unwrap_or(schema_hint);
+        let table = table_from_schema(schema)?;
+        let col_list = cols.join(", ");
+        let order = if cols.iter().any(|c| c == "id") {
+            " ORDER BY id"
+        } else if cols.iter().any(|c| c == "product_id") {
+            " ORDER BY product_id"
+        } else {
+            ""
+        };
+        return Some(format!("SELECT {col_list} FROM {table}{order}"));
+    }
+
+    if !has_create(sql) {
+        return None;
+    }
+
+    if problem_id == "0055-index-design"
+        && cols.len() == 2
+        && cols[0] == "columns"
+        && cols[1] == "index_name"
+    {
+        return Some(INDEX_LIST_SQL.trim().to_string());
+    }
+
+    if problem_id == "0080-ddl-design-ecommerce" {
+        if cols.len() == 3
+            && cols[0] == "column_key"
+            && cols[1] == "column_name"
+            && cols[2] == "is_nullable"
+            && case_id == "1"
+        {
+            return Some(
+                r"
+SELECT
+  CASE
+    WHEN p.pk > 0 THEN 'PRI'
+    WHEN EXISTS (
+      SELECT 1 FROM pragma_index_list('users') il
+      JOIN pragma_index_info(il.name) ii ON ii.name = p.name
+      WHERE il.origin = 'u'
+    ) THEN 'UNI'
+    ELSE ''
+  END AS column_key,
+  p.name AS column_name,
+  CASE WHEN p.notnull THEN 'NO' ELSE 'YES' END AS is_nullable
+FROM pragma_table_info('users') AS p
+WHERE p.pk > 0 OR p.name IN ('username', 'email')
+ORDER BY p.cid
+"
+                .trim()
+                .to_string(),
+            );
+        }
+        if cols.len() == 2
+            && cols[0] == "table_name"
+            && cols[1] == "constraint_type"
+            && case_id == "2"
+        {
+            return Some(
+                r"
+SELECT 'orders' AS table_name, 'FOREIGN KEY' AS constraint_type
+FROM sqlite_master
+WHERE name = 'orders' AND sql LIKE '%FOREIGN KEY%'
+"
+                .trim()
+                .to_string(),
+            );
+        }
+        if cols.len() == 3
+            && cols[0] == "column_key"
+            && case_id == "3"
+        {
+            return Some(
+                r"
+SELECT '' AS column_key, name AS column_name,
+       CASE WHEN notnull THEN 'NO' ELSE 'YES' END AS is_nullable
+FROM pragma_table_info('order_items')
+WHERE name = 'quantity'
+"
+                .trim()
+                .to_string(),
+            );
+        }
+    }
+
+    if problem_id == "0060-table-design"
+        && cols.len() == 3
+        && cols[0] == "table_name"
+        && cols[1] == "constraint_name"
+        && cols[2] == "constraint_type"
+    {
+        return match case_id {
+            "1" => Some(
+                r"
+SELECT m.name AS table_name,
+       CASE WHEN il.origin = 'pk' THEN 'PRIMARY' ELSE il.name END AS constraint_name,
+       CASE il.origin
+         WHEN 'pk' THEN 'PRIMARY KEY'
+         WHEN 'u' THEN 'UNIQUE'
+         WHEN 'c' THEN 'FOREIGN KEY'
+         ELSE 'INDEX'
+       END AS constraint_type
+FROM sqlite_master AS m
+JOIN pragma_index_list(m.name) AS il ON m.type = 'table'
+WHERE m.name IN ('users','products','orders','order_items')
+  AND il.name NOT LIKE 'sqlite_%'
+ORDER BY m.name, il.seq
+"
+                .trim()
+                .to_string(),
+            ),
+            "2" => Some(
+                r"
+SELECT 'orders' AS table_name, 'fk_orders_user' AS constraint_name, 'FOREIGN KEY' AS constraint_type
+FROM sqlite_master WHERE name = 'orders' AND instr(sql, 'fk_orders_user') > 0
+UNION ALL
+SELECT 'order_items', 'fk_items_order', 'FOREIGN KEY'
+FROM sqlite_master WHERE name = 'order_items' AND instr(sql, 'fk_items_order') > 0
+UNION ALL
+SELECT 'order_items', 'fk_items_product', 'FOREIGN KEY'
+FROM sqlite_master WHERE name = 'order_items' AND instr(sql, 'fk_items_product') > 0
+"
+                .trim()
+                .to_string(),
+            ),
+            "3" => Some(
+                r"
+SELECT 'users' AS table_name, il.name AS constraint_name, 'UNIQUE' AS constraint_type
+FROM pragma_index_list('users') AS il
+WHERE il.origin = 'u'
+ORDER BY il.name
+"
+                .trim()
+                .to_string(),
+            ),
+            _ => None,
+        };
+    }
+
+    None
+}
+
+pub fn append_verify_sql(
+    problem_id: &str,
+    case: &TestCase,
+    schema_hint: &str,
+    sql: &str,
+) -> String {
+    if let Some(verify) = build_verify_sql(problem_id, case, schema_hint, sql) {
+        let base = sql.trim_end().trim_end_matches(';');
+        format!("{base}; {verify}")
+    } else {
+        sql.to_string()
+    }
+}

@@ -1,0 +1,36 @@
+[package]
+name = "sql-oj"
+version = "0.1.0"
+description = "SQL OJ — desktop SQL judge"
+authors = ["SQL-OJ"]
+edition = "2021"
+
+[lib]
+name = "sql_oj_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[[bin]]
+name = "sql-oj"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.32", features = ["bundled"] }
+thiserror = "2"
+chrono = { version = "0.4", features = ["serde"] }
+walkdir = "2"
+tokio = { version = "1", features = ["sync"] }
+regex = "1"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

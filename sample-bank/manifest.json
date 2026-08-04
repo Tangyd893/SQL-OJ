@@ -1,0 +1,5 @@
+{
+  "name": "SQL-OJ Sample Bank",
+  "version": "1.0.0",
+  "problems": ["p001", "p002", "p003"]
+}

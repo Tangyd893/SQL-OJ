@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {
+      "id": "1",
+      "seed": "",
+      "expected_columns": ["id", "name"],
+      "expected_rows": [
+        [1, "Alice"],
+        [2, "Bob"],
+        [3, "Carol"]
+      ]
+    }
+  ]
+}
