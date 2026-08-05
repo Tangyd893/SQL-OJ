@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 全量检查：题目描述 (task.md) · 题解 (solution.sql) · 测试点 (cases.json) 对齐。
@@ -12,7 +12,7 @@
 
 用法:
   python scripts/check_alignment.py
-  python scripts/check_alignment.py --bank banks/pta-150 --fix
+  python scripts/check_alignment.py --bank banks/main --fix
 """
 from __future__ import annotations
 
@@ -341,7 +341,7 @@ def print_report(report: AlignmentReport) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="题目/题解/测试点对齐检查")
-    parser.add_argument("--bank", default=str(ROOT / "banks" / "pta-150"))
+    parser.add_argument("--bank", default=str(ROOT / "banks" / "main"))
     parser.add_argument("--fix", action="store_true", help="修复 task 标题与 solution.sql")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()

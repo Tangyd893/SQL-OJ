@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """从旧 MySQL 主库导出 150 题，转换为外部 SQLite 题库格式。"""
 from __future__ import annotations
@@ -19,7 +19,7 @@ from enrich_test_cases import enrich_test_cases
 from reference_sql import derive_reference_sql
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT_BANK = ROOT / "banks" / "pta-150"
+OUT_BANK = ROOT / "banks" / "main"
 
 DB = {
     "host": os.environ.get("DB_HOST", "127.0.0.1"),

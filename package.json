@@ -13,13 +13,13 @@
     "tauri:build:portable": "tauri build --no-bundle && powershell -ExecutionPolicy Bypass -File scripts/package-portable.ps1",
     "verify:bank": "python scripts/verify_bank.py --write-back",
     "verify:bank:fix": "python scripts/verify_bank.py --write-back --fix-expected",
-    "generate:solutions": "python scripts/generate_solution_sql.py --bank banks/pta-150 --write",
-    "generate:solutions:dry": "python scripts/generate_solution_sql.py --bank banks/pta-150",
-    "check:alignment": "python scripts/check_alignment.py --bank banks/pta-150",
-    "check:alignment:fix": "python scripts/check_alignment.py --bank banks/pta-150 --fix",
+    "generate:solutions": "python scripts/generate_solution_sql.py --bank banks/main --write",
+    "generate:solutions:dry": "python scripts/generate_solution_sql.py --bank banks/main",
+    "check:alignment": "python scripts/check_alignment.py --bank banks/main",
+    "check:alignment:fix": "python scripts/check_alignment.py --bank banks/main --fix",
     "check:consistency": "python scripts/check_consistency.py",
-    "import:external": "python scripts/import_external_problems.py --bank banks/pta-150",
-    "import:external:dry": "python scripts/import_external_problems.py --bank banks/pta-150 --dry-run"
+    "import:external": "python scripts/import_external_problems.py --bank banks/main",
+    "import:external:dry": "python scripts/import_external_problems.py --bank banks/main --dry-run"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

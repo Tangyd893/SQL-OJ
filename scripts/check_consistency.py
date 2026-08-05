@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 检查外部题库与 MySQL 源库的一致性，并校验题库内部结构。
 
 用法:
   python scripts/check_consistency.py
-  python scripts/check_consistency.py --bank banks/pta-150 --json
+  python scripts/check_consistency.py --bank banks/main --json
 """
 from __future__ import annotations
 
@@ -323,7 +323,7 @@ def print_report(report: ConsistencyReport) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="检查题库与 MySQL 一致性")
-    parser.add_argument("--bank", default=str(ROOT / "banks" / "pta-150"))
+    parser.add_argument("--bank", default=str(ROOT / "banks" / "main"))
     parser.add_argument("--no-verify", action="store_true", help="跳过 SQLite 验证")
     parser.add_argument("--json", action="store_true", help="输出 JSON 报告")
     args = parser.parse_args()

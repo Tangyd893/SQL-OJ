@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 校验外部题库：为每个测试点推导 reference_sql，在 SQLite 沙箱中验证能否得到期望结果。
 
 用法:
   python scripts/verify_bank.py
-  python scripts/verify_bank.py --bank banks/pta-150 --write-back
+  python scripts/verify_bank.py --bank banks/main --write-back
 """
 from __future__ import annotations
 
@@ -281,7 +281,7 @@ def verify_bank(bank: Path, write_back: bool, fix_expected: bool) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--bank", default=str(ROOT / "banks" / "pta-150"))
+    parser.add_argument("--bank", default=str(ROOT / "banks" / "main"))
     parser.add_argument(
         "--write-back",
         action="store_true",

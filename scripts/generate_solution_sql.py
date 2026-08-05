@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 从 cases.json 第一个测试点的 reference_sql 批量生成 solution.sql。
 
 用法:
   python scripts/generate_solution_sql.py
-  python scripts/generate_solution_sql.py --bank banks/pta-150 --write
+  python scripts/generate_solution_sql.py --bank banks/main --write
   python scripts/generate_solution_sql.py --write --force
   python scripts/generate_solution_sql.py --dry-run
 """
@@ -150,7 +150,7 @@ def generate_solutions(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="从 reference_sql 批量生成 solution.sql")
-    parser.add_argument("--bank", default=str(ROOT / "banks" / "pta-150"))
+    parser.add_argument("--bank", default=str(ROOT / "banks" / "main"))
     parser.add_argument(
         "--write",
         action="store_true",

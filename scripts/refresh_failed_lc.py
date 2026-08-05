@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Re-import LC problems whose stored solution/reference is stale."""
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from import_external_problems import (
     write_problem,
 )
 
-BANK = ROOT / "banks" / "pta-150"
+BANK = ROOT / "banks" / "main"
 REPORT = BANK / "alignment-report.json"
 
 FAIL_SLUGS = [

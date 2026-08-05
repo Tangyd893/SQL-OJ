@@ -72,7 +72,7 @@ SQL-OJ/
 ├── 📚 sample-bank/                 # 内置 3 题示例题库（随仓库分发）
 │   └── problems/p001~p003/
 ├── 🗃️  banks/                      # 完整题库（本地生成，默认 .gitignore）
-│   └── pta-150/                    #   PTA 150 + LeetCode 275 = 425 题
+│   └── main/                    #   完整题库（PTA + LeetCode + 面试补题）
 └── 🐍 scripts/                     # 题库校验、导入、对齐检查
     ├── verify_bank.py
     ├── check_alignment.py
@@ -107,9 +107,9 @@ npm install
 | 题库 | 路径 | 说明 |
 |:-----|:-----|:-----|
 | 示例题库 | `sample-bank/` | 3 题，随仓库自带，开箱即用 |
-| 完整题库 | `banks/pta-150/` | 425 题（150 PTA + 275 LeetCode），需本地生成，见下文 |
+| 完整题库 | `banks/main/` | 约 455 题（PTA + LeetCode + 面试补题 30 题），需本地生成，见下文 |
 
-> 🤖 **让 AI 帮你：** 「帮我在 SQL-OJ 项目里运行 LeetCode 导入脚本，生成 banks/pta-150 题库」
+> 🤖 **让 AI 帮你：** 「帮我在 SQL-OJ 项目里运行 LeetCode 导入脚本，生成/链接 banks/main 题库」
 
 ### ▶️ Step 3 — 运行
 
@@ -204,13 +204,13 @@ my-bank/
 | 章节 | 位置 | 说明 |
 |:-----|:-----|:-----|
 | `## 表结构` / 示例数据 | 题目描述页 | 题面内展示 |
-| `## 目标` | 题目描述页 | 作答要求（旧版 `## 任务` 会自动转换） |
-| `## 提示` | 题目描述页 | 可选提示 |
+| `## 目标` | 做题页顶部「题目目标」 | 作答要求（旧版 `## 任务` 会自动转换） |
+| `## 提示` | 做题页顶部「提示」 | 可选提示；与目标左右分栏，高度可拖 |
 | `## 解析` | **题解页** | 加载时自动从描述中剥离 |
 
-## 🗃️ 完整题库（425 题）
+## 🗃️ 完整题库（`banks/main`）
 
-仓库内置 `sample-bank/`（3 题）。完整 **PTA SQL 150 + LeetCode 275** 题库体积较大，默认在 `.gitignore` 中，需在本地生成：
+仓库内置 `sample-bank/`（3 题）。完整题库体积较大，默认在 `.gitignore` 中，需在本地生成：
 
 **从 MySQL 导出 PTA 150 题：**
 
@@ -222,10 +222,10 @@ python scripts/export_mysql_bank.py
 **导入 LeetCode SQL 题（合并到现有 bank）：**
 
 ```bash
-python scripts/import_external_problems.py --bank banks/pta-150 --workers 8
+python scripts/import_external_problems.py --bank banks/main --workers 8
 ```
 
-生成后在应用 **设置** 中链接 `banks/pta-150` 目录即可。
+生成后在应用 **设置** 中链接 `banks/main` 目录即可。
 
 ## 🧪 题库维护脚本
 
@@ -241,7 +241,7 @@ npm run verify:bank
 npm run verify:bank:fix
 ```
 
-题目 / 题解 / 测试点 全量对齐检查（425 题）：
+题目 / 题解 / 测试点 全量对齐检查：
 
 ```bash
 npm run check:alignment
@@ -290,30 +290,30 @@ React UI  ── Tauri invoke ──▶  Rust
 | 判题报 `no such function: date_format` | 题目来自 LeetCode/MySQL 源，确保使用最新版（已内置兼容层） |
 | DML 题提示「未产生查询结果」 | 在 UPDATE/INSERT 后追加 `SELECT` 验证语句 |
 | 修改题库后不生效 | 设置页点击 **重新加载题库**，或重启应用 |
-| `banks/pta-150` 不在仓库里 | 正常，该目录被 gitignore；按上文脚本本地生成 |
+| `banks/main` 不在仓库里 | 正常，该目录被 gitignore；按上文脚本本地生成 |
 
 ## 📖 脚本参数参考
 
 ### verify_bank.py
 
 ```
-python scripts/verify_bank.py --bank banks/pta-150
-python scripts/verify_bank.py --bank banks/pta-150 --write-back
-python scripts/verify_bank.py --bank banks/pta-150 --write-back --fix-expected
+python scripts/verify_bank.py --bank banks/main
+python scripts/verify_bank.py --bank banks/main --write-back
+python scripts/verify_bank.py --bank banks/main --write-back --fix-expected
 ```
 
 ### check_alignment.py
 
 ```
-python scripts/check_alignment.py --bank banks/pta-150
-python scripts/check_alignment.py --bank banks/pta-150 --fix
+python scripts/check_alignment.py --bank banks/main
+python scripts/check_alignment.py --bank banks/main --fix
 ```
 
 ### import_external_problems.py
 
 ```
-python scripts/import_external_problems.py --bank banks/pta-150 --workers 8
-python scripts/import_external_problems.py --bank banks/pta-150 --dry-run
+python scripts/import_external_problems.py --bank banks/main --workers 8
+python scripts/import_external_problems.py --bank banks/main --dry-run
 ```
 
 ---

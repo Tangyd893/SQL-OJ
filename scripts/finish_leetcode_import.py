@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """补导入剩余 6 题 + 刷新已有 lc 题的 schema.sql / solution.sql。"""
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from import_external_problems import (
 )
 from leetcode_schema import prepare_leetcode_schema_statements as prep  # noqa: F401
 
-BANK = ROOT / "banks" / "pta-150"
+BANK = ROOT / "banks" / "main"
 SLUGS = [
     "dynamic-unpivoting-of-a-table",
     "count-artist-occurrences-on-spotify-ranking-list",

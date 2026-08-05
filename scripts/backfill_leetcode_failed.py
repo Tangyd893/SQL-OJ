@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """补全失败力扣题的 SQLite 题解并导入题库。"""
 from __future__ import annotations
@@ -25,8 +25,8 @@ from import_external_problems import (
     write_problem,
 )
 
-REPORT = ROOT / "banks" / "pta-150" / "import-external-report.json"
-BANK = ROOT / "banks" / "pta-150"
+REPORT = ROOT / "banks" / "main" / "import-external-report.json"
+BANK = ROOT / "banks" / "main"
 
 
 def failed_slugs() -> list[str]:

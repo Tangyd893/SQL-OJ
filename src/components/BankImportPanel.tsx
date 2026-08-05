@@ -159,7 +159,7 @@ export function BankImportPanel({
           id="bank-import-path"
           className="fg-input"
           value={path}
-          placeholder="例如 D:\workspace\coding\SQL-OJ\banks\pta-150"
+          placeholder="例如 D:\workspace\coding\SQL-OJ\banks\main"
           onChange={(e) => {
             setPath(e.target.value)
             setInspect(null)
@@ -239,7 +239,7 @@ export function BankImportPanel({
       task.md        # 题目描述
       cases.json     # 测试点`}</pre>
         <p className="settings-desc">
-          开发环境可使用 <code>banks/pta-150</code>（150 题）或 <code>sample-bank</code>（3 题示例）。
+          开发环境可使用 <code>banks/main</code>（完整题库）或 <code>sample-bank</code>（3 题示例）。
           便携版 exe 需自行携带题库文件夹。
         </p>
       </details>

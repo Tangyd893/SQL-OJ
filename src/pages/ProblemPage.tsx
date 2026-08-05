@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
@@ -20,6 +20,7 @@ import { useProblemSplit } from '../hooks/useProblemSplit'
 import { loadDraft, saveDraft } from '../lib/drafts'
 import { preferProblemList, setLastProblem } from '../lib/navigation'
 import { getNextProblemId } from '../lib/problemNeighbors'
+import { splitProblemBrief } from '../lib/problemBrief'
 import {
   loadResult,
   loadTab,
@@ -44,22 +45,26 @@ export function ProblemPage() {
   const navigate = useNavigate()
   const editorTheme = useMonacoTheme()
   const display = useDisplaySettings()
+  const [problem, setProblem] = useState<ProblemDetail | null>(null)
+  const brief = useMemo(
+    () => splitProblemBrief(problem?.description ?? ''),
+    [problem?.description],
+  )
+  const hasBriefContent = Boolean(brief.goals || brief.hints)
   const {
     splitRef,
     setLeftPaneNode,
-    setToolbarNode,
-    toolbarContentRef,
+    setBriefNode,
     leftPercent,
-    toolbarHeight,
+    briefHeight,
     dragging,
     onSplitPointerDown,
-    onToolbarPointerDown,
+    onBriefPointerDown,
     onResizerPointerMove,
     onResizerPointerUp,
-  } = useProblemSplit()
+  } = useProblemSplit(hasBriefContent)
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const editorActionsRef = useRef<{ dispose: () => void }[]>([])
-  const [problem, setProblem] = useState<ProblemDetail | null>(null)
   const [sql, setSql] = useState('SELECT ')
   const [tab, setTab] = useState<ProblemTab>('desc')
   const [result, setResult] = useState<JudgeResult | null>(null)
@@ -280,8 +285,8 @@ export function ProblemPage() {
 
   return (
     <div className="problem-layout">
-      <header className="problem-toolbar" ref={setToolbarNode}>
-        <div className="problem-toolbar-content" ref={toolbarContentRef}>
+      <header className="problem-toolbar">
+        <div className="problem-toolbar-content">
           <div className="problem-toolbar-main">
             <Link
               to="/problems"
@@ -329,13 +334,44 @@ export function ProblemPage() {
         </div>
       </header>
 
+      <section
+        className={`problem-brief${hasBriefContent ? '' : ' is-empty'}`}
+        ref={setBriefNode}
+        aria-label="题目目标与提示"
+      >
+        {hasBriefContent && (
+          <div className="problem-brief-grid">
+            <div className="problem-brief-col">
+              <h2 className="problem-brief-heading">题目目标</h2>
+              <div className="problem-brief-body markdown-body">
+                {brief.goals ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{brief.goals}</ReactMarkdown>
+                ) : (
+                  <p className="problem-brief-empty">暂无目标说明</p>
+                )}
+              </div>
+            </div>
+            <div className="problem-brief-col">
+              <h2 className="problem-brief-heading">提示</h2>
+              <div className="problem-brief-body markdown-body">
+                {brief.hints ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{brief.hints}</ReactMarkdown>
+                ) : (
+                  <p className="problem-brief-empty">暂无提示</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
       <div
-        className={`problem-toolbar-resizer${dragging === 'toolbar' ? ' dragging' : ''}`}
+        className={`problem-toolbar-resizer${dragging === 'brief' ? ' dragging' : ''}`}
         role="separator"
         aria-orientation="horizontal"
-        aria-label="调整顶部工具栏高度"
-        aria-valuenow={toolbarHeight}
-        onPointerDown={onToolbarPointerDown}
+        aria-label="调整目标与提示区域高度"
+        aria-valuenow={briefHeight}
+        onPointerDown={onBriefPointerDown}
         onPointerMove={onResizerPointerMove}
         onPointerUp={onResizerPointerUp}
         onPointerCancel={onResizerPointerUp}
@@ -372,10 +408,8 @@ export function ProblemPage() {
           <div className="problem-pane-scroll">
             <div className={`tab-panel${tab === 'desc' ? '' : ' hidden'}`}>
               <div className="markdown-body">
-                {problem.description ? (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {problem.description}
-                  </ReactMarkdown>
+                {brief.body ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{brief.body}</ReactMarkdown>
                 ) : (
                   '（无描述）'
                 )}

@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 从力扣（LeetCode CN）拉取 SQL 题，配合社区题解转换为外部题库格式并去重合并。
 
 用法:
-  python scripts/import_external_problems.py --bank banks/pta-150 --dry-run --limit 5
-  python scripts/import_external_problems.py --bank banks/pta-150 --workers 8
-  python scripts/import_external_problems.py --bank banks/pta-150 --leetcode-only
+  python scripts/import_external_problems.py --bank banks/main --dry-run --limit 5
+  python scripts/import_external_problems.py --bank banks/main --workers 8
+  python scripts/import_external_problems.py --bank banks/main --leetcode-only
 """
 from __future__ import annotations
 
@@ -418,7 +418,7 @@ def update_manifest(bank: Path, ids: list[str]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Import LeetCode SQL problems into bank")
-    parser.add_argument("--bank", default=str(ROOT / "banks" / "pta-150"))
+    parser.add_argument("--bank", default=str(ROOT / "banks" / "main"))
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--limit", type=int, default=300)
     parser.add_argument("--workers", type=int, default=8, help="Concurrent fetch workers")

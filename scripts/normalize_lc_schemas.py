@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Normalize all lc-* schema.sql: blank-line split + semicolons + apostrophe fix."""
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from leetcode_schema import prepare_stored_schema, split_schema_statements
 
-BANK = ROOT / "banks" / "pta-150"
+BANK = ROOT / "banks" / "main"
 
 
 def main() -> int:

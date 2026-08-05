@@ -6,40 +6,44 @@ import {
   SPLIT_MIN,
   TOOLBAR_HEIGHT_AUTO,
   toolbarHeightMaxPx,
-  type LayoutPrefs,
 } from '../lib/layoutPrefs'
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value))
 }
 
-type DragKind = 'split' | 'toolbar'
+type DragKind = 'split' | 'brief'
 
-export function useProblemSplit() {
+/** Collapsed / hidden brief strip. */
+export const BRIEF_HEIGHT_MIN = 0
+/** Comfortable default when 目标/提示 exist and no saved preference. */
+export const BRIEF_HEIGHT_DEFAULT = 120
+
+export function useProblemSplit(hasBriefContent: boolean) {
   const splitRef = useRef<HTMLDivElement>(null)
   const leftPaneRef = useRef<HTMLElement | null>(null)
-  const toolbarRef = useRef<HTMLElement | null>(null)
-  const toolbarContentRef = useRef<HTMLDivElement | null>(null)
+  const briefRef = useRef<HTMLElement | null>(null)
 
   const [leftPercent, setLeftPercent] = useState(
     () => loadLayoutPrefs().problemLeftPercent,
   )
-  const [toolbarHeight, setToolbarHeight] = useState(
-    () => loadLayoutPrefs().problemToolbarHeight,
-  )
+  const [briefHeight, setBriefHeight] = useState(() => {
+    const saved = loadLayoutPrefs().problemToolbarHeight
+    if (saved > 0) return saved
+    return hasBriefContent ? BRIEF_HEIGHT_DEFAULT : TOOLBAR_HEIGHT_AUTO
+  })
   const [dragging, setDragging] = useState<DragKind | null>(null)
 
   const leftPercentRef = useRef(leftPercent)
-  const toolbarHeightRef = useRef(toolbarHeight)
+  const briefHeightRef = useRef(briefHeight)
   leftPercentRef.current = leftPercent
-  toolbarHeightRef.current = toolbarHeight
+  briefHeightRef.current = briefHeight
 
   const dragState = useRef<{
     kind: DragKind
     pointerId: number
     startClient: number
     startValue: number
-    contentMin: number
   } | null>(null)
 
   const applyLeftWidth = useCallback((percent: number) => {
@@ -47,73 +51,65 @@ export function useProblemSplit() {
     if (pane) pane.style.width = `${percent}%`
   }, [])
 
-  const applyToolbarHeight = useCallback((height: number) => {
-    const bar = toolbarRef.current
-    if (!bar) return
-    if (height <= 0) {
-      bar.style.minHeight = ''
-    } else {
-      bar.style.minHeight = `${height}px`
-    }
+  const applyBriefHeight = useCallback((height: number) => {
+    const el = briefRef.current
+    if (!el) return
+    // Use explicit height (not minHeight) so drag delta maps 1:1 to the bar.
+    el.style.height = `${Math.max(0, height)}px`
   }, [])
 
-  // Re-apply when committed values change. Skip while dragging so React
-  // re-renders (e.g. setDragging) cannot clobber the live DOM size.
   useLayoutEffect(() => {
     if (dragging) return
     applyLeftWidth(leftPercent)
-    applyToolbarHeight(toolbarHeight)
-  }, [leftPercent, toolbarHeight, dragging, applyLeftWidth, applyToolbarHeight])
+    applyBriefHeight(briefHeight)
+  }, [leftPercent, briefHeight, dragging, applyLeftWidth, applyBriefHeight])
 
-  // Mirror usePointerSize: after setDragging, restore live sizes that React
-  // style props may have overwritten on the same frame.
   useLayoutEffect(() => {
     if (!dragging) return
     if (dragging === 'split') applyLeftWidth(leftPercentRef.current)
-    if (dragging === 'toolbar') applyToolbarHeight(toolbarHeightRef.current)
-  }, [dragging, applyLeftWidth, applyToolbarHeight])
+    if (dragging === 'brief') applyBriefHeight(briefHeightRef.current)
+  }, [dragging, applyLeftWidth, applyBriefHeight])
 
-  const setLeftPaneNode = useCallback(
-    (node: HTMLElement | null) => {
-      leftPaneRef.current = node
-      if (node) node.style.width = `${leftPercentRef.current}%`
-    },
-    [],
-  )
+  // When brief content appears and height is still 0, open to default once.
+  useEffect(() => {
+    if (!hasBriefContent) return
+    if (briefHeightRef.current > 0) return
+    const saved = loadLayoutPrefs().problemToolbarHeight
+    if (saved > 0) return
+    const next = BRIEF_HEIGHT_DEFAULT
+    briefHeightRef.current = next
+    setBriefHeight(next)
+    applyBriefHeight(next)
+  }, [hasBriefContent, applyBriefHeight])
 
-  const setToolbarNode = useCallback((node: HTMLElement | null) => {
-    toolbarRef.current = node
-    if (node) {
-      const h = toolbarHeightRef.current
-      if (h <= 0) node.style.minHeight = ''
-      else node.style.minHeight = `${h}px`
-    }
+  const setLeftPaneNode = useCallback((node: HTMLElement | null) => {
+    leftPaneRef.current = node
+    if (node) node.style.width = `${leftPercentRef.current}%`
   }, [])
+
+  const setBriefNode = useCallback(
+    (node: HTMLElement | null) => {
+      briefRef.current = node
+      if (node) applyBriefHeight(briefHeightRef.current)
+    },
+    [applyBriefHeight],
+  )
 
   useEffect(() => {
     const sync = () => {
       const prefs = loadLayoutPrefs()
       setLeftPercent(prefs.problemLeftPercent)
-      setToolbarHeight(prefs.problemToolbarHeight)
+      const h =
+        prefs.problemToolbarHeight > 0
+          ? prefs.problemToolbarHeight
+          : hasBriefContent
+            ? BRIEF_HEIGHT_DEFAULT
+            : TOOLBAR_HEIGHT_AUTO
+      setBriefHeight(h)
     }
     window.addEventListener('sqloj:layout-changed', sync)
     return () => window.removeEventListener('sqloj:layout-changed', sync)
-  }, [])
-
-  /** Natural content height; never larger than the toolbar's current box. */
-  const measureToolbarContentMin = useCallback(() => {
-    const content = toolbarContentRef.current
-    const bar = toolbarRef.current
-    if (!bar) return 56
-    const barH = bar.getBoundingClientRect().height
-    if (!content) return Math.round(barH)
-    const styles = getComputedStyle(bar)
-    const padY =
-      (parseFloat(styles.paddingTop) || 0) + (parseFloat(styles.paddingBottom) || 0)
-    const measured = content.getBoundingClientRect().height + padY
-    // Cap at current height so a bad measurement cannot jump the bar on grab.
-    return Math.round(Math.min(measured, barH) || barH)
-  }, [])
+  }, [hasBriefContent])
 
   const endDrag = useCallback(() => {
     const state = dragState.current
@@ -128,26 +124,25 @@ export function useProblemSplit() {
       const rounded = Math.round(next)
       setLeftPercent(rounded)
       applyLeftWidth(rounded)
-      const prefs: LayoutPrefs = {
+      saveLayoutPrefs({
         ...loadLayoutPrefs(),
         problemLeftPercent: rounded,
-      }
-      saveLayoutPrefs(prefs)
+      })
       return
     }
 
-    const contentMin = state.contentMin
-    let next = toolbarHeightRef.current
-    if (next <= contentMin + 1) next = TOOLBAR_HEIGHT_AUTO
-    else next = Math.round(clamp(next, contentMin, toolbarHeightMaxPx()))
-    setToolbarHeight(next)
-    applyToolbarHeight(next)
-    const prefs: LayoutPrefs = {
+    let next = Math.round(
+      clamp(briefHeightRef.current, BRIEF_HEIGHT_MIN, toolbarHeightMaxPx()),
+    )
+    if (next <= 1) next = TOOLBAR_HEIGHT_AUTO
+    briefHeightRef.current = next
+    setBriefHeight(next)
+    applyBriefHeight(next)
+    saveLayoutPrefs({
       ...loadLayoutPrefs(),
       problemToolbarHeight: next,
-    }
-    saveLayoutPrefs(prefs)
-  }, [applyLeftWidth, applyToolbarHeight])
+    })
+  }, [applyLeftWidth, applyBriefHeight])
 
   const onSplitPointerDown = useCallback((e: React.PointerEvent) => {
     if (e.button !== 0) return
@@ -158,33 +153,30 @@ export function useProblemSplit() {
       pointerId: e.pointerId,
       startClient: e.clientX,
       startValue: leftPercentRef.current,
-      contentMin: 0,
     }
     setDragging('split')
     document.body.classList.add('split-dragging')
   }, [])
 
-  const onToolbarPointerDown = useCallback((e: React.PointerEvent) => {
+  const onBriefPointerDown = useCallback((e: React.PointerEvent) => {
     if (e.button !== 0) return
     e.preventDefault()
     e.currentTarget.setPointerCapture(e.pointerId)
-    const bar = toolbarRef.current
-    // Always use live rendered height — never the preference — so the bar
-    // does not jump to a different size on press.
-    const startHeight = bar?.getBoundingClientRect().height ?? 56
-    const contentMin = measureToolbarContentMin()
+    const el = briefRef.current
+    // Live height only — never preference — so press cannot jump.
+    const startHeight = el?.getBoundingClientRect().height ?? briefHeightRef.current
     dragState.current = {
-      kind: 'toolbar',
+      kind: 'brief',
       pointerId: e.pointerId,
       startClient: e.clientY,
       startValue: startHeight,
-      contentMin: Math.min(contentMin, Math.round(startHeight)),
     }
-    toolbarHeightRef.current = startHeight
-    setDragging('toolbar')
+    briefHeightRef.current = startHeight
+    // Ensure height is locked to the measured px before any move.
+    applyBriefHeight(startHeight)
+    setDragging('brief')
     document.body.classList.add('toolbar-dragging')
-    // Do not apply height here — that was causing an immediate jump.
-  }, [measureToolbarContentMin])
+  }, [applyBriefHeight])
 
   const onResizerPointerMove = useCallback(
     (e: React.PointerEvent) => {
@@ -203,16 +195,15 @@ export function useProblemSplit() {
         return
       }
 
-      const maxH = toolbarHeightMaxPx()
       const next = clamp(
         state.startValue + (e.clientY - state.startClient),
-        state.contentMin,
-        maxH,
+        BRIEF_HEIGHT_MIN,
+        toolbarHeightMaxPx(),
       )
-      toolbarHeightRef.current = next
-      applyToolbarHeight(next)
+      briefHeightRef.current = next
+      applyBriefHeight(next)
     },
-    [applyLeftWidth, applyToolbarHeight],
+    [applyLeftWidth, applyBriefHeight],
   )
 
   const onResizerPointerUp = useCallback(
@@ -232,13 +223,12 @@ export function useProblemSplit() {
   return {
     splitRef,
     setLeftPaneNode,
-    setToolbarNode,
-    toolbarContentRef,
+    setBriefNode,
     leftPercent,
-    toolbarHeight,
+    briefHeight,
     dragging,
     onSplitPointerDown,
-    onToolbarPointerDown,
+    onBriefPointerDown,
     onResizerPointerMove,
     onResizerPointerUp,
   }
