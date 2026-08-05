@@ -87,7 +87,8 @@ export function SettingsPage() {
   const [appearance, setAppearance] = useState<AppearanceSettings>(loadAppearance)
   const [display, setDisplay] = useState<DisplaySettings>(loadDisplay)
   const [layout, setLayout] = useState<LayoutPrefs>(loadLayoutPrefs)
-  const { navWidth, dragging, onResizeStart } = useSettingsNavResize()
+  const { navWidth, dragging, setNavNode, onPointerDown, onPointerMove, onPointerUp } =
+    useSettingsNavResize()
 
   useEffect(() => {
     const onDisplay = () => setDisplay(loadDisplay())
@@ -152,7 +153,11 @@ export function SettingsPage() {
       {saved && <div className="alert settings-alert">题库已更新</div>}
 
       <div className="settings-layout">
-        <aside className="settings-nav" style={{ width: navWidth }}>
+        <aside
+          className="settings-nav"
+          ref={setNavNode}
+          style={{ width: navWidth }}
+        >
           {SECTIONS.map((s) => (
             <button
               key={s.id}
@@ -168,7 +173,11 @@ export function SettingsPage() {
           className={`settings-nav-resizer${dragging ? ' dragging' : ''}`}
           role="separator"
           aria-orientation="vertical"
-          onMouseDown={onResizeStart}
+          aria-label="调整设置导航宽度"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
         />
         <div className="settings-content">
           {section === 'appearance' && (

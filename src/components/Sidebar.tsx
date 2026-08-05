@@ -70,9 +70,8 @@ export function Sidebar() {
   const location = useLocation()
   const [prefs, setPrefs] = useState<LayoutPrefs>(() => loadLayoutPrefs())
   const [problemsPath, setProblemsPath] = useState(getProblemsNavPath)
-  const { effectiveWidth, dragging, onResizeStart } = useSidebarResize(
-    prefs.sidebarCollapsed,
-  )
+  const { effectiveWidth, dragging, setSidebarNode, onPointerDown, onPointerMove, onPointerUp } =
+    useSidebarResize(prefs.sidebarCollapsed)
 
   useEffect(() => {
     const sync = () => setPrefs(loadLayoutPrefs())
@@ -97,6 +96,7 @@ export function Sidebar() {
     <>
       <nav
         className={`sidebar${prefs.sidebarCollapsed ? ' is-collapsed' : ''}`}
+        ref={prefs.sidebarCollapsed ? undefined : setSidebarNode}
         style={{ width: effectiveWidth }}
         data-fg-surface
         data-fg-chrome
@@ -146,7 +146,11 @@ export function Sidebar() {
           className={`sidebar-resizer${dragging ? ' dragging' : ''}`}
           role="separator"
           aria-orientation="vertical"
-          onMouseDown={onResizeStart}
+          aria-label="调整侧栏宽度"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
         />
       )}
     </>

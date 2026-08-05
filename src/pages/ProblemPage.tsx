@@ -44,7 +44,19 @@ export function ProblemPage() {
   const navigate = useNavigate()
   const editorTheme = useMonacoTheme()
   const display = useDisplaySettings()
-  const { splitRef, leftPercent, dragging, onResizeStart } = useProblemSplit()
+  const {
+    splitRef,
+    setLeftPaneNode,
+    setToolbarNode,
+    toolbarContentRef,
+    leftPercent,
+    toolbarHeight,
+    dragging,
+    onSplitPointerDown,
+    onToolbarPointerDown,
+    onResizerPointerMove,
+    onResizerPointerUp,
+  } = useProblemSplit()
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const editorActionsRef = useRef<{ dispose: () => void }[]>([])
   const [problem, setProblem] = useState<ProblemDetail | null>(null)
@@ -268,56 +280,75 @@ export function ProblemPage() {
 
   return (
     <div className="problem-layout">
-      <header className="problem-toolbar">
-        <div className="problem-toolbar-main">
-          <Link
-            to="/problems"
-            className="problem-back"
-            onClick={() => preferProblemList()}
-          >
-            ← 题目列表
-          </Link>
-          <h1 className="problem-title">
-            {problem.id} · {problem.title}
-          </h1>
-          <div className="problem-meta">
-            {problem.caseCount} 个测试点 · {submitHint} 提交 · {previewHint} 试运行 · Alt+1~4 切换侧栏
+      <header className="problem-toolbar" ref={setToolbarNode}>
+        <div className="problem-toolbar-content" ref={toolbarContentRef}>
+          <div className="problem-toolbar-main">
+            <Link
+              to="/problems"
+              className="problem-back"
+              onClick={() => preferProblemList()}
+            >
+              ← 题目列表
+            </Link>
+            <h1 className="problem-title">
+              {problem.id} · {problem.title}
+            </h1>
+            <div className="problem-meta">
+              {problem.caseCount} 个测试点 · {submitHint} 提交 · {previewHint} 试运行 · Alt+1~4
+              切换侧栏
+            </div>
+          </div>
+          <div className="problem-toolbar-actions">
+            <ProblemNeighborList problems={allProblems} currentId={id} />
+            <button
+              type="button"
+              className="btn"
+              disabled={!nextProblemId || busy}
+              title={nextProblemId ? undefined : '已是最后一题'}
+              onClick={onNextProblem}
+            >
+              下一题
+            </button>
+            {busy && (
+              <button type="button" className="btn" onClick={() => void cancelJudge()}>
+                取消
+              </button>
+            )}
+            <button type="button" className="btn" disabled={busy} onClick={() => void onPreview()}>
+              {previewing ? '试运行中…' : '试运行'}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={busy}
+              onClick={() => void onSubmit()}
+            >
+              {submitting ? '判题中…' : '提交'}
+            </button>
           </div>
         </div>
-        <div className="problem-toolbar-actions">
-          <ProblemNeighborList problems={allProblems} currentId={id} />
-          <button
-            type="button"
-            className="btn"
-            disabled={!nextProblemId || busy}
-            title={nextProblemId ? undefined : '已是最后一题'}
-            onClick={onNextProblem}
-          >
-            下一题
-          </button>
-          {busy && (
-            <button type="button" className="btn" onClick={() => void cancelJudge()}>
-              取消
-            </button>
-          )}
-          <button type="button" className="btn" disabled={busy} onClick={() => void onPreview()}>
-            {previewing ? '试运行中…' : '试运行'}
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            disabled={busy}
-            onClick={() => void onSubmit()}
-          >
-            {submitting ? '判题中…' : '提交'}
-          </button>
-        </div>
       </header>
+
+      <div
+        className={`problem-toolbar-resizer${dragging === 'toolbar' ? ' dragging' : ''}`}
+        role="separator"
+        aria-orientation="horizontal"
+        aria-label="调整顶部工具栏高度"
+        aria-valuenow={toolbarHeight}
+        onPointerDown={onToolbarPointerDown}
+        onPointerMove={onResizerPointerMove}
+        onPointerUp={onResizerPointerUp}
+        onPointerCancel={onResizerPointerUp}
+      />
 
       {error && <div className="alert alert-error problem-alert">{error}</div>}
 
       <div className="problem-split" ref={splitRef}>
-        <aside className="problem-pane-left" style={{ width: `${leftPercent}%` }}>
+        <aside
+          className="problem-pane-left"
+          ref={setLeftPaneNode}
+          style={{ width: `${leftPercent}%` }}
+        >
           <div className="tabs">
               {(
               [
@@ -424,13 +455,17 @@ export function ProblemPage() {
         </aside>
 
         <div
-          className={`problem-split-resizer${dragging ? ' dragging' : ''}`}
+          className={`problem-split-resizer${dragging === 'split' ? ' dragging' : ''}`}
           role="separator"
           aria-orientation="vertical"
-          aria-valuenow={leftPercent}
-          aria-valuemin={25}
-          aria-valuemax={55}
-          onMouseDown={onResizeStart}
+          aria-label="调整题目描述与编辑器宽度"
+          aria-valuenow={Math.round(leftPercent)}
+          aria-valuemin={20}
+          aria-valuemax={70}
+          onPointerDown={onSplitPointerDown}
+          onPointerMove={onResizerPointerMove}
+          onPointerUp={onResizerPointerUp}
+          onPointerCancel={onResizerPointerUp}
         />
 
         <section className="problem-pane-right">

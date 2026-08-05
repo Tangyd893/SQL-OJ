@@ -68,7 +68,9 @@ a {
 
 .sidebar {
   flex-shrink: 0;
+  flex-grow: 0;
   min-width: 0;
+  overflow: hidden;
   background: var(--fg-sidebar-bg);
   border-right: 1px solid var(--fg-chrome-border);
   display: flex;
@@ -148,6 +150,7 @@ a {
   cursor: col-resize;
   background: var(--fg-border);
   transition: background 0.15s;
+  touch-action: none;
 }
 
 .sidebar-resizer:hover,
@@ -434,16 +437,39 @@ select.fg-input:focus-visible {
   top: 0;
   z-index: 2;
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 12px 16px;
+  border-bottom: none;
+  background: var(--fg-panel-chrome);
+  box-sizing: border-box;
+}
+
+.problem-toolbar-content {
+  display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--fg-border);
-  background: var(--fg-panel-chrome);
+  flex-shrink: 0;
 }
 
 .problem-toolbar-main {
   min-width: 0;
+}
+
+.problem-toolbar-resizer {
+  height: 5px;
+  flex-shrink: 0;
+  cursor: row-resize;
+  background: var(--fg-border);
+  transition: background 0.15s;
+  touch-action: none;
+  z-index: 2;
+}
+
+.problem-toolbar-resizer:hover,
+.problem-toolbar-resizer.dragging {
+  background: var(--fg-accent);
 }
 
 .problem-back {
@@ -582,10 +608,13 @@ select.fg-input:focus-visible {
 
 .problem-pane-left {
   flex-shrink: 0;
+  flex-grow: 0;
   min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
   background: var(--fg-bg);
 }
 
@@ -595,6 +624,7 @@ select.fg-input:focus-visible {
   cursor: col-resize;
   background: var(--fg-border);
   transition: background 0.15s;
+  touch-action: none;
 }
 
 .problem-split-resizer:hover,
@@ -605,6 +635,24 @@ select.fg-input:focus-visible {
 body.split-dragging {
   cursor: col-resize;
   user-select: none;
+}
+
+body.toolbar-dragging {
+  cursor: row-resize;
+  user-select: none;
+}
+
+body.sidebar-dragging,
+body.settings-nav-dragging {
+  cursor: col-resize;
+  user-select: none;
+}
+
+body.split-dragging .problem-pane-right,
+body.toolbar-dragging .problem-pane-right,
+body.sidebar-dragging .main-content,
+body.settings-nav-dragging .settings-content {
+  pointer-events: none;
 }
 
 .problem-pane-scroll {
@@ -623,6 +671,7 @@ body.split-dragging {
   flex: 1;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .editor-wrap {
@@ -661,9 +710,12 @@ body.split-dragging {
 
 .settings-nav {
   flex-shrink: 0;
+  flex-grow: 0;
+  min-width: 0;
   padding: 12px 8px;
   background: var(--fg-sidebar-bg);
   border-right: none;
+  overflow-x: hidden;
   overflow-y: auto;
 }
 
@@ -1191,7 +1243,7 @@ input[type='checkbox'] {
 
 .expandable-chips {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 4px;
   flex: 1;
   min-width: 0;
@@ -1199,7 +1251,7 @@ input[type='checkbox'] {
 
 .filter-tags-row {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 8px;
 }
 

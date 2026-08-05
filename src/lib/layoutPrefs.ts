@@ -1,8 +1,12 @@
 const STORAGE_KEY = 'sql-oj.layout'
 
-export const SPLIT_MIN = 25
-export const SPLIT_MAX = 55
+export const SPLIT_MIN = 20
+export const SPLIT_MAX = 70
 export const SPLIT_DEFAULT = 40
+
+export const TOOLBAR_HEIGHT_AUTO = 0
+export const TOOLBAR_HEIGHT_MAX_PX = 280
+export const TOOLBAR_HEIGHT_MAX_VH = 0.4
 
 export const SIDEBAR_MIN = 180
 export const SIDEBAR_MAX = 280
@@ -15,6 +19,8 @@ export const SETTINGS_NAV_DEFAULT = 200
 
 export interface LayoutPrefs {
   problemLeftPercent: number
+  /** 0 = natural content height; otherwise min-height in px */
+  problemToolbarHeight: number
   showStatusMetrics: boolean
   sidebarCollapsed: boolean
   sidebarWidth: number
@@ -23,10 +29,16 @@ export interface LayoutPrefs {
 
 const defaults: LayoutPrefs = {
   problemLeftPercent: SPLIT_DEFAULT,
+  problemToolbarHeight: TOOLBAR_HEIGHT_AUTO,
   showStatusMetrics: true,
   sidebarCollapsed: false,
   sidebarWidth: SIDEBAR_DEFAULT,
   settingsNavWidth: SETTINGS_NAV_DEFAULT,
+}
+
+export function toolbarHeightMaxPx(): number {
+  if (typeof window === 'undefined') return TOOLBAR_HEIGHT_MAX_PX
+  return Math.min(TOOLBAR_HEIGHT_MAX_PX, Math.round(window.innerHeight * TOOLBAR_HEIGHT_MAX_VH))
 }
 
 export function loadLayoutPrefs(): LayoutPrefs {
@@ -39,6 +51,9 @@ export function loadLayoutPrefs(): LayoutPrefs {
         Math.round(parsed.problemLeftPercent ?? defaults.problemLeftPercent),
         SPLIT_MIN,
         SPLIT_MAX,
+      ),
+      problemToolbarHeight: clampToolbarHeight(
+        Math.round(parsed.problemToolbarHeight ?? defaults.problemToolbarHeight),
       ),
       showStatusMetrics: parsed.showStatusMetrics ?? defaults.showStatusMetrics,
       sidebarCollapsed: parsed.sidebarCollapsed ?? defaults.sidebarCollapsed,
@@ -70,4 +85,9 @@ export function resetLayoutPrefs(): LayoutPrefs {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value))
+}
+
+function clampToolbarHeight(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) return TOOLBAR_HEIGHT_AUTO
+  return clamp(value, 1, toolbarHeightMaxPx())
 }
